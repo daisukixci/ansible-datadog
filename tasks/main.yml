@@ -10,12 +10,16 @@
 - name: Check if OS is supported
   include_tasks: os-check.yml
 
-- name: Resolve datadog_tracked_checks later to defend against variable presidence issues arising from dynamically included null datadog_checks 
+- name: Resolve datadog_tracked_checks later to defend against variable presidence issues arising from dynamically included null datadog_checks
   include_tasks: sanitize-checks.yml
 
 # Also sets datadog_skip_install
 - name: Set Facts for Datadog Agent Major Version
   include_tasks: set-parse-version.yml
+
+- name: Check and resolve APM injection settings
+  include_tasks: apm-inject-check.yml
+  when: datadog_apm_host_injection_enabled or datadog_apm_host_docker_injection_enabled
 
 - name: Debian Install Tasks
   include_tasks: pkg-debian.yml
@@ -71,5 +75,5 @@
   when: datadog_integration is defined
 
 - name: APM Host injection tasks
-  include_tasks: apm-host-injection.yml
-  when: datadog_apm_host_injection_enabled
+  include_tasks: apm-inject-install.yml
+  when: datadog_apm_host_injection_enabled or datadog_apm_host_docker_injection_enabled
